@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Settings, ShieldCheck, IndianRupee, Clock, CheckCircle2 } from "lucide-react";
+import { Building2, Settings, ShieldCheck, IndianRupee, Clock, CheckCircle2, Database, RefreshCw, HardDrive } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 
 export default function SettingsPage() {
@@ -18,6 +18,48 @@ export default function SettingsPage() {
   const [phone, setPhone] = React.useState(org.contact_phone);
   const [gst, setGst] = React.useState(org.gst_number || "");
   const [rentDueDay, setRentDueDay] = React.useState("5");
+  const [mongoStatus, setMongoStatus] = React.useState<any>(null);
+  const [loadingMongo, setLoadingMongo] = React.useState(false);
+  const [seeding, setSeeding] = React.useState(false);
+
+  const fetchMongoStatus = async () => {
+    try {
+      setLoadingMongo(true);
+      const res = await fetch("/api/mongodb/status");
+      const data = await res.json();
+      setMongoStatus(data);
+    } catch (e: any) {
+      setMongoStatus({ connected: false, error: e.message });
+    } finally {
+      setLoadingMongo(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchMongoStatus();
+  }, []);
+
+  const handleReSeed = async () => {
+    try {
+      setSeeding(true);
+      const res = await fetch("/api/mongodb/seed", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        toast({
+          title: "MongoDB Seeded",
+          description: `Seeded ${data.seeded.properties} properties, ${data.seeded.rooms} rooms, ${data.seeded.beds} beds, ${data.seeded.residents} residents.`,
+          type: "success",
+        });
+        await fetchMongoStatus();
+      } else {
+        toast({ title: "Seed Failed", description: data.error, type: "error" });
+      }
+    } catch (e: any) {
+      toast({ title: "Seed Error", description: e.message, type: "error" });
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +119,87 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Database & MongoDB Status */}
+        <Card className="border-slate-200 bg-white">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <div className="flex items-center space-x-2">
+                <Database className="w-4 h-4 text-emerald-600" />
+                <CardTitle className="text-sm font-semibold">Local Database Connection (MongoDB)</CardTitle>
+                <Badge className={mongoStatus?.connected ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
+                  {mongoStatus?.connected ? "Connected" : "Checking..."}
+                </Badge>
+              </div>
+              <CardDescription className="mt-1">
+                Connected to local MongoDB instance: <code className="bg-slate-100 px-1 py-0.5 rounded text-[11px] font-mono text-slate-800">mongodb://localhost:27017/staymanage</code>
+              </CardDescription>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={fetchMongoStatus}
+                disabled={loadingMongo}
+                className="text-xs"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingMongo ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleReSeed}
+                disabled={seeding}
+                className="text-xs text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                {seeding ? "Seeding..." : "Re-seed Mock Data"}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {mongoStatus?.connected && mongoStatus.counts ? (
+              <div className="grid grid-cols-4 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 text-center">
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-lg font-bold text-slate-900">{mongoStatus.counts.properties}</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Properties</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-lg font-bold text-slate-900">{mongoStatus.counts.rooms}</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Rooms</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-lg font-bold text-slate-900">{mongoStatus.counts.beds}</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Beds</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-lg font-bold text-slate-900">{mongoStatus.counts.residents}</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Residents</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-lg font-bold text-slate-900">{mongoStatus.counts.rent_charges}</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Rent Invoices</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-lg font-bold text-slate-900">{mongoStatus.counts.payments}</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Payments</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-lg font-bold text-slate-900">{mongoStatus.counts.deposits}</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Deposit Txns</div>
+                </div>
+                <div className="p-2 bg-white rounded border border-slate-200">
+                  <div className="text-lg font-bold text-slate-900">{mongoStatus.counts.maintenance_tickets}</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Complaints</div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-slate-500 text-xs italic">Checking MongoDB database health on localhost:27017...</p>
+            )}
           </CardContent>
         </Card>
 

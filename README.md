@@ -55,7 +55,8 @@
 | Layer | Technologies |
 |---|---|
 | **Frontend** | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Lucide React |
-| **Data & State** | Supabase PostgreSQL, Row Level Security (RLS), In-Memory Demo Store with LocalStorage sync |
+| **Database & ORM** | MongoDB (Local `mongodb://127.0.0.1:27017/staymanage`), Mongoose 8 with strict index constraints |
+| **Data & State** | MongoDB REST APIs + Client Reactive Store with LocalStorage synchronization |
 | **Analytics** | Recharts responsive charting engine |
 | **Form & Validation**| Zod, React Hook Form |
 | **Testing** | Vitest unit and integration test suite |
@@ -77,15 +78,25 @@ Copy `.env.example` to `.env.local`:
 ```bash
 cp .env.example .env.local
 ```
-*(By default, `NEXT_PUBLIC_DEMO_MODE=true` is enabled, allowing zero-friction local exploration with pre-seeded data without needing a remote database provisioned first).*
+Configure your MongoDB connection string (default configured for local MongoDB):
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/staymanage
+```
 
-### 3. Run Development Server
+### 3. Seed MongoDB with Realistic PG Mock Data
+Run the automated seed command to populate your local MongoDB with 3 properties, 17 rooms, 34 beds, 24 residents, billing charges, payments, deposits, and tickets:
+```bash
+npm run seed:mongo
+```
+*(You can also re-seed anytime directly from the UI via the "Seed MongoDB" button in the top banner or Organization Settings).*
+
+### 4. Run Development Server
 ```bash
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 4. Run Automated Business Rule Tests
+### 5. Run Automated Business Rule Tests
 ```bash
 npm test
 ```
@@ -118,29 +129,45 @@ A top banner is present throughout the application to switch between personas in
 
 ---
 
-## 🗄️ Database Architecture & Migrations
+## 🗄️ Database Architecture & Schemas
 
-The complete PostgreSQL schema with Row Level Security (RLS) is located at:
-`supabase/migrations/20261119000001_create_staymanage_schema.sql`
+### MongoDB Primary Data Store (`src/lib/mongodb/`)
+StayManage connects directly to local MongoDB (`mongodb://127.0.0.1:27017/staymanage`) using Mongoose models (`src/lib/mongodb/models.ts`):
+- `OrganizationModel`: Multi-property parent business account with GSTIN and billing policies.
+- `ProfileModel`: User authentication and role association (`owner`, `manager`, `resident`).
+- `PropertyModel`: Multi-building records (floors, rules, location, contact numbers).
+- `RoomModel`: Room records with floor numbers, sharing configurations, and base rent.
+- `BedModel`: Individual beds (`101-A`, `101-B`) with operational status.
+- `ResidentModel`: Indian PG residents with contact info, emergency contacts, and permanent address.
+- `StayModel`: Occupancy allocations with **strict single-occupancy constraint**:
+  ```ts
+  StaySchema.index({ bed_id: 1 }, { unique: true, partialFilterExpression: { status: "active" } });
+  ```
+- `RentChargeModel`: Monthly rent records with **idempotency constraint**:
+  ```ts
+  RentChargeSchema.index({ stay_id: 1, billing_month: 1 }, { unique: true });
+  ```
+- `PaymentModel`: Manual payments with receipt numbers, UPI references, and allocation.
+- `DepositTransactionModel`: Escrow ledger for deposit collections, deductions, and checkout refunds.
+- `MaintenanceTicketModel`: Complaints with priority ratings, categories, and resolution logs.
+- `NotificationModel`: System alerts and action notices.
 
-Core tables:
-- `organizations`
-- `profiles`
-- `organization_memberships`
-- `properties`
-- `property_manager_assignments`
-- `rooms`
-- `beds`
-- `residents`
-- `stays` (occupancy assignments with unique partial index on `bed_id` where `status = 'active'`)
-- `rent_charges` (with `UNIQUE(stay_id, billing_month)`)
-- `payments`
-- `payment_allocations`
-- `deposit_transactions`
-- `maintenance_tickets`
-- `ticket_comments`
-- `notifications`
-- `audit_logs`
+### MongoDB REST APIs (`src/app/api/`)
+- `GET /api/mongodb/status`: Returns MongoDB connection status, database name, and live collection document counts.
+- `POST /api/mongodb/seed`: Triggers automated database re-seeding with realistic Indian PG mock records.
+- `GET, POST /api/properties`: Multi-property management.
+- `GET, POST /api/rooms`: Room creation with automatic sub-bed letter generation.
+- `GET, POST /api/residents`: Resident registration with bed allocation and deposit recording.
+- `GET, PUT /api/residents/[id]`: Resident 360 profile and contact info editing.
+- `POST /api/residents/transfer`: Bed transfer with target occupancy verification.
+- `POST /api/residents/checkout`: Move-out with deposit deductions, refunds, and bed release.
+- `POST /api/rent/generate`: Idempotent monthly rent charge generation.
+- `POST /api/rent/payments`: Manual payment recording with automatic status transitions.
+- `GET, POST /api/deposits`: Security deposit ledger transactions.
+- `GET, POST /api/maintenance`: Complaint submission and ticket list.
+- `PATCH /api/maintenance/[id]`: Status updates and staff comment threads.
+
+*(For legacy reference, the original PostgreSQL schema with Row Level Security is preserved in `supabase/migrations/`).*
 
 ---
 
