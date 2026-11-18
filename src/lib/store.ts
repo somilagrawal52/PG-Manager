@@ -292,6 +292,15 @@ class Store {
     return residents.find((r) => r.id === id);
   }
 
+  updateResident(id: string, updates: Partial<Resident>): Resident {
+    const index = this.state.residents.findIndex((r) => r.id === id);
+    if (index === -1) throw new Error("Resident not found");
+    const updated = { ...this.state.residents[index], ...updates };
+    this.state.residents[index] = updated;
+    this.save();
+    return this.getResident(id)!;
+  }
+
   registerResident(
     residentData: Omit<Resident, "id" | "organization_id" | "created_at">,
     allocation?: {

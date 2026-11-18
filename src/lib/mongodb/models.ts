@@ -110,7 +110,7 @@ const StaySchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
     resident_id: { type: String, required: true, index: true },
-    bed_id: { type: String, required: true, index: true },
+    bed_id: { type: String, required: true },
     property_id: { type: String, required: true, index: true },
     check_in_date: { type: String, required: true },
     expected_check_out_date: { type: String },

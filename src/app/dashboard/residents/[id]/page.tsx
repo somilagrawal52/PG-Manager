@@ -53,12 +53,32 @@ export default function ResidentDetailPage() {
   const [refundRupees, setRefundRupees] = React.useState(0);
   const [refundMethod, setRefundMethod] = React.useState<"upi" | "bank_transfer" | "cash">("upi");
 
+  // Edit Resident Modal
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [editName, setEditName] = React.useState("");
+  const [editPhone, setEditPhone] = React.useState("");
+  const [editEmail, setEditEmail] = React.useState("");
+  const [editEmergencyName, setEditEmergencyName] = React.useState("");
+  const [editEmergencyPhone, setEditEmergencyPhone] = React.useState("");
+  const [editAddress, setEditAddress] = React.useState("");
+  const [editNotes, setEditNotes] = React.useState("");
+
   const loadData = React.useCallback(() => {
     const res = appStore.getResident(residentId);
     setResident(res);
     setRentCharges(appStore.getRentCharges().filter((c) => c.resident_id === residentId));
     setPayments(appStore.getPayments().filter((p) => p.resident_id === residentId));
     setDepositTx(appStore.getDepositTransactions(residentId));
+
+    if (res) {
+      setEditName(res.full_name);
+      setEditPhone(res.phone);
+      setEditEmail(res.email || "");
+      setEditEmergencyName(res.emergency_contact_name || "");
+      setEditEmergencyPhone(res.emergency_contact_phone || "");
+      setEditAddress(res.permanent_address || "");
+      setEditNotes(res.notes || "");
+    }
 
     const vacantBeds = appStore.getBeds().filter((b) => b.status === "available");
     setAvailableBeds(vacantBeds);
@@ -145,6 +165,30 @@ export default function ResidentDetailPage() {
     }
   };
 
+  const handleSaveResident = (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      appStore.updateResident(resident.id, {
+        full_name: editName,
+        phone: editPhone,
+        email: editEmail || undefined,
+        emergency_contact_name: editEmergencyName || undefined,
+        emergency_contact_phone: editEmergencyPhone || undefined,
+        permanent_address: editAddress || undefined,
+        notes: editNotes || undefined,
+      });
+
+      toast({
+        title: "Resident Details Updated",
+        description: `Profile for ${editName} saved successfully.`,
+        type: "success",
+      });
+      setIsEditOpen(false);
+    } catch (err: any) {
+      toast({ title: "Failed to update resident", description: err.message, type: "error" });
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Header */}
@@ -169,25 +213,35 @@ export default function ResidentDetailPage() {
           </Badge>
         </div>
 
-        {resident.status === "active" && (
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsTransferOpen(true)}
-              className="text-xs h-8"
-            >
-              <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" /> Transfer Bed
-            </Button>
-            <Button
-              size="sm"
-              onClick={openCheckoutModal}
-              className="bg-rose-600 hover:bg-rose-700 text-xs h-8 text-white shadow-xs"
-            >
-              <LogOut className="mr-1.5 h-3.5 w-3.5" /> Initiate Move-out / Checkout
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditOpen(true)}
+            className="text-xs h-8"
+          >
+            Edit Profile
+          </Button>
+          {resident.status === "active" && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsTransferOpen(true)}
+                className="text-xs h-8"
+              >
+                <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" /> Transfer Bed
+              </Button>
+              <Button
+                size="sm"
+                onClick={openCheckoutModal}
+                className="bg-rose-600 hover:bg-rose-700 text-xs h-8 text-white shadow-xs"
+              >
+                <LogOut className="mr-1.5 h-3.5 w-3.5" /> Initiate Move-out / Checkout
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Main Resident Profile Card */}
@@ -560,6 +614,66 @@ export default function ResidentDetailPage() {
               </Button>
               <Button type="submit" size="sm" className="bg-rose-600 hover:bg-rose-700 text-white">
                 Confirm Checkout & Free Bed
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Resident Profile Modal */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Resident Details</DialogTitle>
+            <DialogDescription>
+              Update contact information, emergency contacts, and notes
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveResident} className="space-y-4 text-xs">
+            <div>
+              <label className="block font-medium text-slate-700 mb-1">Full Name</label>
+              <Input value={editName} onChange={(e) => setEditName(e.target.value)} required />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block font-medium text-slate-700 mb-1">Phone Number</label>
+                <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} required />
+              </div>
+              <div>
+                <label className="block font-medium text-slate-700 mb-1">Email Address</label>
+                <Input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block font-medium text-slate-700 mb-1">Emergency Contact Person</label>
+                <Input value={editEmergencyName} onChange={(e) => setEditEmergencyName(e.target.value)} />
+              </div>
+              <div>
+                <label className="block font-medium text-slate-700 mb-1">Emergency Phone</label>
+                <Input value={editEmergencyPhone} onChange={(e) => setEditEmergencyPhone(e.target.value)} />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-medium text-slate-700 mb-1">Permanent Home Address</label>
+              <Input value={editAddress} onChange={(e) => setEditAddress(e.target.value)} />
+            </div>
+
+            <div>
+              <label className="block font-medium text-slate-700 mb-1">Notes / Preferences</label>
+              <Input value={editNotes} onChange={(e) => setEditNotes(e.target.value)} />
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" size="sm" onClick={() => setIsEditOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm" className="bg-blue-600 hover:bg-blue-700">
+                Save Details
               </Button>
             </DialogFooter>
           </form>

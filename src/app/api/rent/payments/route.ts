@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { appStore } from "@/lib/store";
+import { connectToDatabase } from "@/lib/mongodb/client";
+import { PaymentModel, RentChargeModel } from "@/lib/mongodb/models";
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +15,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // Update in-store
     const payment = appStore.recordPayment({
       resident_id,
       rent_charge_id,
@@ -22,6 +25,30 @@ export async function POST(request: Request) {
       reference_number,
       notes,
     });
+
+    // Sync in MongoDB
+    try {
+      await connectToDatabase();
+      await PaymentModel.create({
+        ...payment,
+      });
+
+      if (rent_charge_id) {
+        const charge = await RentChargeModel.findOne({ id: rent_charge_id });
+        if (charge) {
+          charge.amount_paid_paise += Number(amount_paise);
+          const totalDue = charge.amount_paise + charge.late_fee_paise;
+          if (charge.amount_paid_paise >= totalDue) {
+            charge.status = "paid";
+          } else if (charge.amount_paid_paise > 0) {
+            charge.status = "partially_paid";
+          }
+          await charge.save();
+        }
+      }
+    } catch {
+      // In-store fallback
+    }
 
     return NextResponse.json({
       success: true,

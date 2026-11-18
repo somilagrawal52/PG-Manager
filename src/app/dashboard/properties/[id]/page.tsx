@@ -9,22 +9,43 @@ import { formatINR } from "@/lib/utils";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Building2, MapPin, Phone, BedDouble, Plus, Layers, CheckCircle2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { ArrowLeft, Building2, MapPin, Phone, BedDouble, Plus, Layers, CheckCircle2, Edit3 } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
 
 export default function PropertyDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { toast } = useToast();
   const propertyId = params.id as string;
 
   const [property, setProperty] = React.useState<Property | undefined>(() => appStore.getProperty(propertyId));
   const [rooms, setRooms] = React.useState<Room[]>(() => appStore.getRooms(propertyId));
   const [beds, setBeds] = React.useState<Bed[]>(() => appStore.getBeds());
 
+  // Edit modal
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [editName, setEditName] = React.useState("");
+  const [editPhone, setEditPhone] = React.useState("");
+  const [editFloors, setEditFloors] = React.useState(1);
+  const [editDescription, setEditDescription] = React.useState("");
+  const [editRules, setEditRules] = React.useState("");
+
   React.useEffect(() => {
     const update = () => {
-      setProperty(appStore.getProperty(propertyId));
+      const p = appStore.getProperty(propertyId);
+      setProperty(p);
       setRooms(appStore.getRooms(propertyId));
       setBeds(appStore.getBeds());
+
+      if (p) {
+        setEditName(p.name);
+        setEditPhone(p.contact_phone);
+        setEditFloors(p.total_floors);
+        setEditDescription(p.description || "");
+        setEditRules(p.rules_and_policies || "");
+      }
     };
     update();
     const unsubscribe = appStore.subscribe(update);
@@ -48,6 +69,28 @@ export default function PropertyDetailPage() {
   const occupiedBeds = propBeds.filter((b) => b.status === "occupied").length;
   const occupancyRate = propBeds.length > 0 ? Math.round((occupiedBeds / propBeds.length) * 100) : 0;
 
+  const handleSaveProperty = (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      appStore.updateProperty(property.id, {
+        name: editName,
+        contact_phone: editPhone,
+        total_floors: Number(editFloors),
+        description: editDescription,
+        rules_and_policies: editRules,
+      });
+
+      toast({
+        title: "Property Updated",
+        description: `Changes to "${editName}" have been saved.`,
+        type: "success",
+      });
+      setIsEditOpen(false);
+    } catch (err: any) {
+      toast({ title: "Failed to update property", description: err.message, type: "error" });
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Navigation */}
@@ -63,11 +106,21 @@ export default function PropertyDetailPage() {
           </Badge>
         </div>
 
-        <Link href="/dashboard/rooms">
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 h-8 text-xs">
-            <Plus className="mr-1 h-3.5 w-3.5" /> Add Room to this Property
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditOpen(true)}
+            className="h-8 text-xs"
+          >
+            <Edit3 className="mr-1 h-3.5 w-3.5 text-blue-600" /> Edit Details
           </Button>
-        </Link>
+          <Link href="/dashboard/rooms">
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 h-8 text-xs">
+              <Plus className="mr-1 h-3.5 w-3.5" /> Add Room to this Property
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Main Details Card */}
@@ -82,6 +135,11 @@ export default function PropertyDetailPage() {
             <p className="text-xs text-slate-500 flex items-center mt-1">
               <Phone className="h-3.5 w-3.5 mr-1 text-slate-400" /> {property.contact_phone}
             </p>
+            {property.description && (
+              <p className="text-xs text-slate-600 mt-2 max-w-2xl leading-relaxed">
+                {property.description}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center space-x-3">
@@ -156,6 +214,70 @@ export default function PropertyDetailPage() {
           })}
         </div>
       </div>
+
+      {/* Edit Property Modal */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Property Details</DialogTitle>
+            <DialogDescription>
+              Update building details, manager phone, and house rules
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveProperty} className="space-y-4 text-xs">
+            <div>
+              <label className="block font-medium text-slate-700 mb-1">Property Name</label>
+              <Input value={editName} onChange={(e) => setEditName(e.target.value)} required />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block font-medium text-slate-700 mb-1">Contact Phone</label>
+                <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} required />
+              </div>
+              <div>
+                <label className="block font-medium text-slate-700 mb-1">Total Floors</label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={25}
+                  value={editFloors}
+                  onChange={(e) => setEditFloors(Number(e.target.value))}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-medium text-slate-700 mb-1">Description</label>
+              <Input
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium text-slate-700 mb-1">Rules & Policies</label>
+              <textarea
+                rows={4}
+                value={editRules}
+                onChange={(e) => setEditRules(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 p-2 text-xs focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" size="sm" onClick={() => setIsEditOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm" className="bg-blue-600 hover:bg-blue-700">
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

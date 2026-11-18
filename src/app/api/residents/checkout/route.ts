@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb/client";
+import { StayModel, ResidentModel, BedModel, DepositTransactionModel } from "@/lib/mongodb/models";
 import { appStore } from "@/lib/store";
 
 export async function POST(request: Request) {
@@ -13,6 +15,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // 1. Update in memory store
     appStore.checkoutResident({
       residentId: resident_id,
       checkOutDate: check_out_date,
@@ -21,6 +24,50 @@ export async function POST(request: Request) {
       refundPaise: Number(refund_paise || 0),
       refundMethod: refund_method || "upi",
     });
+
+    // 2. Persist in MongoDB if available
+    try {
+      await connectToDatabase();
+      const currentStay = await StayModel.findOne({ resident_id, status: "active" });
+      if (currentStay) {
+        currentStay.status = "completed";
+        currentStay.actual_check_out_date = check_out_date;
+        await currentStay.save();
+
+        await BedModel.updateOne({ id: currentStay.bed_id }, { status: "available" });
+        await ResidentModel.updateOne({ id: resident_id }, { status: "checked_out" });
+
+        if (deduction_paise > 0) {
+          await DepositTransactionModel.create({
+            id: `dep-deduct-${Date.now()}`,
+            resident_id,
+            stay_id: currentStay.id,
+            property_id: currentStay.property_id,
+            transaction_type: "deduction",
+            amount_paise: deduction_paise,
+            reason: deduction_reason || "Move-out inspection deduction",
+            payment_method: "other",
+            transaction_date: check_out_date,
+          });
+        }
+
+        if (refund_paise > 0) {
+          await DepositTransactionModel.create({
+            id: `dep-refund-${Date.now()}`,
+            resident_id,
+            stay_id: currentStay.id,
+            property_id: currentStay.property_id,
+            transaction_type: "refund",
+            amount_paise: refund_paise,
+            reason: "Security deposit settlement refund",
+            payment_method: refund_method || "upi",
+            transaction_date: check_out_date,
+          });
+        }
+      }
+    } catch {
+      // In-store update succeeded
+    }
 
     return NextResponse.json({
       success: true,

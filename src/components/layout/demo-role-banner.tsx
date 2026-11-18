@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { appStore } from "@/lib/store";
 import { UserRole } from "@/lib/types";
-import { ShieldCheck, UserCog, User, RotateCcw, ExternalLink } from "lucide-react";
+import { ShieldCheck, UserCog, User, RotateCcw, Database, CheckCircle2, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 
 export function DemoRoleBanner() {
@@ -12,12 +12,29 @@ export function DemoRoleBanner() {
   const pathname = usePathname();
   const { toast } = useToast();
   const [currentRole, setCurrentRole] = React.useState<UserRole>("owner");
+  const [mongoStatus, setMongoStatus] = React.useState<{ connected: boolean; count?: number }>({
+    connected: true,
+  });
+  const [isSeeding, setIsSeeding] = React.useState(false);
 
   React.useEffect(() => {
     setCurrentRole(appStore.getState().currentRole);
     const unsubscribe = appStore.subscribe(() => {
       setCurrentRole(appStore.getState().currentRole);
     });
+
+    // Check MongoDB status
+    fetch("/api/mongodb/status")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.connected) {
+          setMongoStatus({ connected: true, count: data.counts?.residents });
+        } else {
+          setMongoStatus({ connected: false });
+        }
+      })
+      .catch(() => setMongoStatus({ connected: false }));
+
     return unsubscribe;
   }, []);
 
@@ -43,12 +60,35 @@ export function DemoRoleBanner() {
     }
   };
 
+  const handleSeedMongo = async () => {
+    setIsSeeding(true);
+    try {
+      const res = await fetch("/api/mongodb/seed", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        appStore.resetToDemo();
+        toast({
+          title: "MongoDB Database Seeded!",
+          description: "Populated 3 properties, 17 rooms, 34 beds, 24 residents, rent charges, and tickets.",
+          type: "success",
+        });
+        window.location.reload();
+      } else {
+        toast({ title: "Seed Failed", description: data.error, type: "error" });
+      }
+    } catch (err: any) {
+      toast({ title: "Connection Error", description: err.message, type: "error" });
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
   const handleReset = () => {
     if (confirm("Reset demo data back to default Indian PG seed?")) {
       appStore.resetToDemo();
       toast({
         title: "Demo Data Reset",
-        description: "Restored Green Nest PG, Urban Stay Hostel, and 20 fictional residents.",
+        description: "Restored Green Nest PG, Urban Stay, Lotus Co-Living, and fictional residents.",
         type: "success",
       });
       window.location.reload();
@@ -59,11 +99,15 @@ export function DemoRoleBanner() {
     <div className="bg-slate-900 text-white text-xs px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 no-print">
       <div className="flex items-center space-x-2">
         <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-        <span className="font-semibold text-slate-200">StayManage Demo Environment</span>
-        <span className="hidden md:inline text-slate-400">|</span>
-        <span className="hidden md:inline text-slate-400">
-          Indian PG & Hostel Multi-Tenant SaaS (₹ INR / Asia:Kolkata)
-        </span>
+        <span className="font-semibold text-slate-200">StayManage</span>
+        <span className="text-slate-500">|</span>
+
+        {/* MongoDB Status Indicator */}
+        <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/30 text-emerald-300 font-mono text-[11px]">
+          <Database className="h-3 w-3 text-emerald-400" />
+          <span>MongoDB: localhost:27017</span>
+          <span className="text-emerald-400 font-bold hidden sm:inline">(Connected)</span>
+        </div>
       </div>
 
       <div className="flex items-center space-x-2">
@@ -105,6 +149,16 @@ export function DemoRoleBanner() {
             <span>Resident</span>
           </button>
         </div>
+
+        <button
+          onClick={handleSeedMongo}
+          disabled={isSeeding}
+          title="Seed and sync local MongoDB"
+          className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-md bg-emerald-900/60 text-emerald-300 hover:text-white hover:bg-emerald-800 border border-emerald-700/50 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`h-3 w-3 ${isSeeding ? "animate-spin" : ""}`} />
+          <span className="hidden md:inline">{isSeeding ? "Seeding..." : "Seed MongoDB"}</span>
+        </button>
 
         <button
           onClick={handleReset}
