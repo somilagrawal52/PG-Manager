@@ -1,4 +1,9 @@
 {
-  "/page": "app/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/resident/page": "app/resident/page.js",
+  "/resident/room/page": "app/resident/room/page.js",
+  "/resident/rent/page": "app/resident/rent/page.js",
+  "/resident/complaints/page": "app/resident/complaints/page.js",
+  "/resident/announcements/page": "app/resident/announcements/page.js",
+  "/resident/profile/page": "app/resident/profile/page.js"
 }

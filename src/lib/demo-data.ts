@@ -70,7 +70,7 @@ export const DEMO_PROPERTIES: Property[] = [
     contact_phone: "+91 98765 11223",
     contact_email: "greennest@staymanage.demo",
     total_floors: 3,
-    rules_and_policies: "1. Gate closes at 11:30 PM.\n2. Non-resident visitors restricted after 9:00 PM.\n3. Smoking and alcohol prohibited inside rooms.\n4. Notice period: 30 days mandatory before vacating.",
+    rules_and_policies: "1. Main gate closes at 11:30 PM.\n2. Non-resident visitors restricted after 9:00 PM.\n3. Smoking and alcohol strictly prohibited inside premises.\n4. Notice period: 30 days mandatory before vacating.",
     amenities: ["High-Speed Wi-Fi", "Daily Cleaning", "3 Meals Included", "Power Backup", "RO Water", "CCTV Security", "Washing Machine"],
     image_url: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80",
     is_active: true,
@@ -80,7 +80,7 @@ export const DEMO_PROPERTIES: Property[] = [
     id: "prop-us-002",
     organization_id: DEMO_ORG.id,
     name: "Urban Stay Hostel",
-    description: "Modern student & working professional hostel in HSR Layout with spacious study areas, gym access, and 24/7 security.",
+    description: "Modern student & working professional hostel in HSR Layout with spacious study areas, gym access, and 24/7 biometric security.",
     property_type: "hostel",
     address: "24th Main, Sector 2, HSR Layout",
     city: "Bengaluru",
@@ -89,11 +89,30 @@ export const DEMO_PROPERTIES: Property[] = [
     contact_phone: "+91 98765 44556",
     contact_email: "urbanstay@staymanage.demo",
     total_floors: 2,
-    rules_and_policies: "1. Biometric punch mandatory for entry.\n2. Quiet hours between 11 PM to 6 AM.\n3. AC units to be powered off when room is unattended.\n4. Rent due strictly on or before 5th of every month.",
+    rules_and_policies: "1. Biometric punch mandatory for entry/exit.\n2. Quiet study hours between 11 PM to 6 AM.\n3. AC units to be turned off when room is unattended.\n4. Rent due strictly on or before 5th of every month.",
     amenities: ["Air Conditioning", "Wi-Fi 300 Mbps", "Biometric Entry", "Study Room", "Gym & Lounge", "Self-Cook Kitchen", "Elevator"],
     image_url: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80",
     is_active: true,
     created_at: "2026-02-15T00:00:00Z",
+  },
+  {
+    id: "prop-lc-003",
+    organization_id: DEMO_ORG.id,
+    name: "Lotus Co-Living Residency",
+    description: "Upscale executive co-living facility near ITPL Whitefield with ergonomic work-from-home spaces, cafeteria, and rooftop recreation lounge.",
+    property_type: "co_living",
+    address: "ITPL Main Road, Near Hope Farm Junction, Whitefield",
+    city: "Bengaluru",
+    state: "Karnataka",
+    pincode: "560066",
+    contact_phone: "+91 98450 77889",
+    contact_email: "lotuscoliving@staymanage.demo",
+    total_floors: 3,
+    rules_and_policies: "1. Visitors permitted in common lounge only.\n2. Professional conduct expected in collaborative workspaces.\n3. Security deposit settled within 7 days of checkout.",
+    amenities: ["High-Speed Wi-Fi", "Coworking Space", "Rooftop Cafe", "Daily Housekeeping", "Smart TV in Rooms", "Biometric Access", "Gymnasium"],
+    image_url: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80",
+    is_active: true,
+    created_at: "2026-04-01T00:00:00Z",
   },
 ];
 
@@ -143,7 +162,7 @@ export const DEMO_ROOMS: Room[] = [
     floor_number: 2,
     room_type: "double",
     capacity: 2,
-    base_rent_paise: 750000, // ₹7,500 / month
+    base_rent_paise: 750000,
     amenities: ["Attached Bathroom", "Balcony", "Geyser"],
     status: "active",
     created_at: "2026-01-15T00:00:00Z",
@@ -205,8 +224,8 @@ export const DEMO_ROOMS: Room[] = [
     floor_number: 1,
     room_type: "double",
     capacity: 2,
-    base_rent_paise: 850000, // ₹8,500 / month
-    amenities: ["AC", "Attached Bath", "Work Desk", "Ergonomic Chair"],
+    base_rent_paise: 850000,
+    amenities: ["AC", "Attached Bath", "Work Desk"],
     status: "active",
     created_at: "2026-02-20T00:00:00Z",
   },
@@ -217,7 +236,7 @@ export const DEMO_ROOMS: Room[] = [
     floor_number: 1,
     room_type: "four_plus",
     capacity: 4,
-    base_rent_paise: 500000, // ₹5,000 / month
+    base_rent_paise: 500000,
     amenities: ["Bunk Beds", "Lockers", "Attached Bath"],
     status: "active",
     created_at: "2026-02-20T00:00:00Z",
@@ -242,8 +261,8 @@ export const DEMO_ROOMS: Room[] = [
     floor_number: 2,
     room_type: "single",
     capacity: 1,
-    base_rent_paise: 1400000, // ₹14,000 / month
-    amenities: ["AC", "Attached Bath", "Private Balcony", "TV", "Recliner"],
+    base_rent_paise: 1400000,
+    amenities: ["AC", "Attached Bath", "Private Balcony", "TV"],
     status: "active",
     created_at: "2026-02-20T00:00:00Z",
   },
@@ -259,10 +278,60 @@ export const DEMO_ROOMS: Room[] = [
     status: "active",
     created_at: "2026-02-20T00:00:00Z",
   },
+  // Lotus Co-Living - Floor 1
+  {
+    id: "room-lc-101",
+    property_id: "prop-lc-003",
+    room_number: "L-101",
+    floor_number: 1,
+    room_type: "single",
+    capacity: 1,
+    base_rent_paise: 1600000,
+    amenities: ["King Bed", "Smart TV", "AC", "Private Kitchenette"],
+    status: "active",
+    created_at: "2026-04-05T00:00:00Z",
+  },
+  {
+    id: "room-lc-102",
+    property_id: "prop-lc-003",
+    room_number: "L-102",
+    floor_number: 1,
+    room_type: "double",
+    capacity: 2,
+    base_rent_paise: 1000000,
+    amenities: ["Twin Beds", "AC", "Ensuite Bath", "Balcony"],
+    status: "active",
+    created_at: "2026-04-05T00:00:00Z",
+  },
+  // Lotus Co-Living - Floor 2
+  {
+    id: "room-lc-201",
+    property_id: "prop-lc-003",
+    room_number: "L-201",
+    floor_number: 2,
+    room_type: "double",
+    capacity: 2,
+    base_rent_paise: 1050000,
+    amenities: ["Twin Beds", "AC", "Attached Bath"],
+    status: "active",
+    created_at: "2026-04-05T00:00:00Z",
+  },
+  {
+    id: "room-lc-202",
+    property_id: "prop-lc-003",
+    room_number: "L-202",
+    floor_number: 2,
+    room_type: "single",
+    capacity: 1,
+    base_rent_paise: 1700000,
+    amenities: ["King Bed", "AC", "Work Desk", "Balcony"],
+    status: "active",
+    created_at: "2026-04-05T00:00:00Z",
+  },
 ];
 
 export const DEMO_BEDS: Bed[] = [
-  // Room 101 (2 beds)
+  // Green Nest PG - Room 101 (2 beds)
   { id: "bed-gn-101-a", room_id: "room-gn-101", property_id: "prop-gn-001", bed_identifier: "101-A", status: "occupied", created_at: "2026-01-15T00:00:00Z" },
   { id: "bed-gn-101-b", room_id: "room-gn-101", property_id: "prop-gn-001", bed_identifier: "101-B", status: "occupied", created_at: "2026-01-15T00:00:00Z" },
   // Room 102 (3 beds)
@@ -286,6 +355,7 @@ export const DEMO_BEDS: Bed[] = [
   // Room 302 (2 beds)
   { id: "bed-gn-302-a", room_id: "room-gn-302", property_id: "prop-gn-001", bed_identifier: "302-A", status: "occupied", created_at: "2026-01-15T00:00:00Z" },
   { id: "bed-gn-302-b", room_id: "room-gn-302", property_id: "prop-gn-001", bed_identifier: "302-B", status: "occupied", created_at: "2026-01-15T00:00:00Z" },
+
   // Urban Stay - Room U101 (2 beds)
   { id: "bed-us-101-a", room_id: "room-us-101", property_id: "prop-us-002", bed_identifier: "U101-A", status: "occupied", created_at: "2026-02-20T00:00:00Z" },
   { id: "bed-us-101-b", room_id: "room-us-101", property_id: "prop-us-002", bed_identifier: "U101-B", status: "occupied", created_at: "2026-02-20T00:00:00Z" },
@@ -303,6 +373,17 @@ export const DEMO_BEDS: Bed[] = [
   { id: "bed-us-203-a", room_id: "room-us-203", property_id: "prop-us-002", bed_identifier: "U203-A", status: "occupied", created_at: "2026-02-20T00:00:00Z" },
   { id: "bed-us-203-b", room_id: "room-us-203", property_id: "prop-us-002", bed_identifier: "U203-B", status: "available", created_at: "2026-02-20T00:00:00Z" },
   { id: "bed-us-203-c", room_id: "room-us-203", property_id: "prop-us-002", bed_identifier: "U203-C", status: "occupied", created_at: "2026-02-20T00:00:00Z" },
+
+  // Lotus Co-Living - Room L-101 (1 bed)
+  { id: "bed-lc-101-a", room_id: "room-lc-101", property_id: "prop-lc-003", bed_identifier: "L101-A", status: "occupied", created_at: "2026-04-05T00:00:00Z" },
+  // Room L-102 (2 beds)
+  { id: "bed-lc-102-a", room_id: "room-lc-102", property_id: "prop-lc-003", bed_identifier: "L102-A", status: "occupied", created_at: "2026-04-05T00:00:00Z" },
+  { id: "bed-lc-102-b", room_id: "room-lc-102", property_id: "prop-lc-003", bed_identifier: "L102-B", status: "available", created_at: "2026-04-05T00:00:00Z" },
+  // Room L-201 (2 beds)
+  { id: "bed-lc-201-a", room_id: "room-lc-201", property_id: "prop-lc-003", bed_identifier: "L201-A", status: "occupied", created_at: "2026-04-05T00:00:00Z" },
+  { id: "bed-lc-201-b", room_id: "room-lc-201", property_id: "prop-lc-003", bed_identifier: "L201-B", status: "occupied", created_at: "2026-04-05T00:00:00Z" },
+  // Room L-202 (1 bed)
+  { id: "bed-lc-202-a", room_id: "room-lc-202", property_id: "prop-lc-003", bed_identifier: "L202-A", status: "available", created_at: "2026-04-05T00:00:00Z" },
 ];
 
 export const DEMO_RESIDENTS: Resident[] = [
@@ -469,6 +550,7 @@ export const DEMO_RESIDENTS: Resident[] = [
     status: "active",
     created_at: "2026-03-10T00:00:00Z",
   },
+  // Urban Stay Residents
   {
     id: "res-014",
     organization_id: DEMO_ORG.id,
@@ -553,6 +635,59 @@ export const DEMO_RESIDENTS: Resident[] = [
     status: "active",
     created_at: "2026-03-28T00:00:00Z",
   },
+  // Lotus Co-Living Residents
+  {
+    id: "res-021",
+    organization_id: DEMO_ORG.id,
+    full_name: "Arjun Nambiar",
+    phone: "+91 98471 23456",
+    email: "arjun.n@gmail.com",
+    emergency_contact_name: "K. Nambiar (Father)",
+    emergency_contact_phone: "+91 98471 99887",
+    permanent_address: "Kadavanthra, Kochi, Kerala",
+    status: "active",
+    notes: "Engineering Manager at Oracle.",
+    created_at: "2026-04-10T00:00:00Z",
+  },
+  {
+    id: "res-022",
+    organization_id: DEMO_ORG.id,
+    full_name: "Deepika Padukone",
+    phone: "+91 98200 12345",
+    email: "deepika.p@gmail.com",
+    emergency_contact_name: "Prakash Padukone (Father)",
+    emergency_contact_phone: "+91 98200 98765",
+    permanent_address: "Cunningham Road, Bengaluru, Karnataka",
+    status: "active",
+    notes: "UI/UX Consultant.",
+    created_at: "2026-04-12T00:00:00Z",
+  },
+  {
+    id: "res-023",
+    organization_id: DEMO_ORG.id,
+    full_name: "Abhishek Mukherjee",
+    phone: "+91 98311 23456",
+    email: "abhishek.m@gmail.com",
+    emergency_contact_name: "B. Mukherjee (Father)",
+    emergency_contact_phone: "+91 98311 88776",
+    permanent_address: "Jodhpur Park, Kolkata, West Bengal",
+    status: "active",
+    notes: "Financial Analyst at Goldman Sachs.",
+    created_at: "2026-04-15T00:00:00Z",
+  },
+  {
+    id: "res-024",
+    organization_id: DEMO_ORG.id,
+    full_name: "Zainab Fatima",
+    phone: "+91 98492 34567",
+    email: "zainab.f@gmail.com",
+    emergency_contact_name: "Mirza Fatima (Father)",
+    emergency_contact_phone: "+91 98492 98765",
+    permanent_address: "Banjara Hills Road 12, Hyderabad, Telangana",
+    status: "active",
+    notes: "Architect at Gensler.",
+    created_at: "2026-04-20T00:00:00Z",
+  },
 ];
 
 export const DEMO_STAYS: Stay[] = [
@@ -564,7 +699,7 @@ export const DEMO_STAYS: Stay[] = [
     property_id: "prop-gn-001",
     check_in_date: "2026-01-20",
     monthly_rent_paise: 700000,
-    security_deposit_paise: 1400000, // ₹14,000 (2 months)
+    security_deposit_paise: 1400000,
     status: "active",
     created_at: "2026-01-20T00:00:00Z",
   },
@@ -701,6 +836,7 @@ export const DEMO_STAYS: Stay[] = [
     status: "active",
     created_at: "2026-03-10T00:00:00Z",
   },
+
   // Urban Stay Hostel stays
   {
     id: "stay-014",
@@ -779,9 +915,54 @@ export const DEMO_STAYS: Stay[] = [
     status: "active",
     created_at: "2026-03-28T00:00:00Z",
   },
+
+  // Lotus Co-Living stays
+  {
+    id: "stay-021",
+    resident_id: "res-021", // Arjun Nambiar
+    bed_id: "bed-lc-101-a",
+    property_id: "prop-lc-003",
+    check_in_date: "2026-04-10",
+    monthly_rent_paise: 1600000,
+    security_deposit_paise: 3200000,
+    status: "active",
+    created_at: "2026-04-10T00:00:00Z",
+  },
+  {
+    id: "stay-022",
+    resident_id: "res-022", // Deepika Padukone
+    bed_id: "bed-lc-102-a",
+    property_id: "prop-lc-003",
+    check_in_date: "2026-04-12",
+    monthly_rent_paise: 1000000,
+    security_deposit_paise: 2000000,
+    status: "active",
+    created_at: "2026-04-12T00:00:00Z",
+  },
+  {
+    id: "stay-023",
+    resident_id: "res-023", // Abhishek Mukherjee
+    bed_id: "bed-lc-201-a",
+    property_id: "prop-lc-003",
+    check_in_date: "2026-04-15",
+    monthly_rent_paise: 1050000,
+    security_deposit_paise: 2100000,
+    status: "active",
+    created_at: "2026-04-15T00:00:00Z",
+  },
+  {
+    id: "stay-024",
+    resident_id: "res-024", // Zainab Fatima
+    bed_id: "bed-lc-201-b",
+    property_id: "prop-lc-003",
+    check_in_date: "2026-04-20",
+    monthly_rent_paise: 1050000,
+    security_deposit_paise: 2100000,
+    status: "active",
+    created_at: "2026-04-20T00:00:00Z",
+  },
 ];
 
-// Rent charges for current month (November 2026) and previous month
 export const DEMO_RENT_CHARGES: RentCharge[] = [
   // 1. Rahul Sharma (Prompt Example: Monthly rent ₹7,000, due 5 Nov 2026, amount paid ₹3,000, outstanding ₹4,000)
   {
@@ -794,7 +975,7 @@ export const DEMO_RENT_CHARGES: RentCharge[] = [
     due_date: "2026-11-05",
     amount_paise: 700000,
     late_fee_paise: 0,
-    amount_paid_paise: 300000, // Partially paid ₹3,000
+    amount_paid_paise: 300000, // Partial ₹3,000 paid, ₹4,000 pending
     status: "partially_paid",
     notes: "Remaining ₹4,000 promised by 20th Nov.",
     created_at: "2026-11-01T00:00:00Z",
@@ -827,7 +1008,7 @@ export const DEMO_RENT_CHARGES: RentCharge[] = [
     late_fee_paise: 25000, // ₹250 late fee
     amount_paid_paise: 0,
     status: "overdue",
-    notes: "Reminder sent on 10 Nov.",
+    notes: "Payment reminder dispatched.",
     created_at: "2026-11-01T00:00:00Z",
   },
   // 4. Sneha Iyer (Fully paid)
@@ -890,7 +1071,22 @@ export const DEMO_RENT_CHARGES: RentCharge[] = [
     status: "overdue",
     created_at: "2026-11-01T00:00:00Z",
   },
-  // 8. Karthik Nair (Notice period, paid)
+  // 8. Kavya Reddy (Fully paid)
+  {
+    id: "charge-nov-008",
+    organization_id: DEMO_ORG.id,
+    property_id: "prop-gn-001",
+    resident_id: "res-008",
+    stay_id: "stay-008",
+    billing_month: "2026-11-01",
+    due_date: "2026-11-05",
+    amount_paise: 550000,
+    late_fee_paise: 0,
+    amount_paid_paise: 550000,
+    status: "paid",
+    created_at: "2026-11-01T00:00:00Z",
+  },
+  // 9. Karthik Nair (Notice period, paid)
   {
     id: "charge-nov-009",
     organization_id: DEMO_ORG.id,
@@ -905,7 +1101,7 @@ export const DEMO_RENT_CHARGES: RentCharge[] = [
     status: "paid",
     created_at: "2026-11-01T00:00:00Z",
   },
-  // Urban Stay charges
+  // 10. Divya Krishnan (Urban Stay - Fully Paid)
   {
     id: "charge-nov-014",
     organization_id: DEMO_ORG.id,
@@ -920,6 +1116,7 @@ export const DEMO_RENT_CHARGES: RentCharge[] = [
     status: "paid",
     created_at: "2026-11-01T00:00:00Z",
   },
+  // 11. Varun Kapoor (Urban Stay - Partial)
   {
     id: "charge-nov-015",
     organization_id: DEMO_ORG.id,
@@ -930,22 +1127,53 @@ export const DEMO_RENT_CHARGES: RentCharge[] = [
     due_date: "2026-11-05",
     amount_paise: 850000,
     late_fee_paise: 0,
-    amount_paid_paise: 400000, // Partial ₹4,000 paid, ₹4,500 pending
+    amount_paid_paise: 400000, // ₹4,000 paid, ₹4,500 pending
     status: "partially_paid",
     created_at: "2026-11-01T00:00:00Z",
   },
+  // 12. Arjun Nambiar (Lotus Co-Living - Fully Paid)
   {
-    id: "charge-nov-020",
+    id: "charge-nov-021",
     organization_id: DEMO_ORG.id,
-    property_id: "prop-us-002",
-    resident_id: "res-020",
-    stay_id: "stay-020",
+    property_id: "prop-lc-003",
+    resident_id: "res-021",
+    stay_id: "stay-021",
     billing_month: "2026-11-01",
     due_date: "2026-11-05",
-    amount_paise: 1400000,
+    amount_paise: 1600000,
     late_fee_paise: 0,
-    amount_paid_paise: 1400000,
+    amount_paid_paise: 1600000,
     status: "paid",
+    created_at: "2026-11-01T00:00:00Z",
+  },
+  // 13. Deepika Padukone (Lotus Co-Living - Fully Paid)
+  {
+    id: "charge-nov-022",
+    organization_id: DEMO_ORG.id,
+    property_id: "prop-lc-003",
+    resident_id: "res-022",
+    stay_id: "stay-022",
+    billing_month: "2026-11-01",
+    due_date: "2026-11-05",
+    amount_paise: 1000000,
+    late_fee_paise: 0,
+    amount_paid_paise: 1000000,
+    status: "paid",
+    created_at: "2026-11-01T00:00:00Z",
+  },
+  // 14. Abhishek Mukherjee (Lotus Co-Living - Overdue)
+  {
+    id: "charge-nov-023",
+    organization_id: DEMO_ORG.id,
+    property_id: "prop-lc-003",
+    resident_id: "res-023",
+    stay_id: "stay-023",
+    billing_month: "2026-11-01",
+    due_date: "2026-11-05",
+    amount_paise: 1050000,
+    late_fee_paise: 30000,
+    amount_paid_paise: 0,
+    status: "overdue",
     created_at: "2026-11-01T00:00:00Z",
   },
 ];
@@ -1012,18 +1240,46 @@ export const DEMO_PAYMENTS: Payment[] = [
     created_at: "2026-11-05T18:00:00Z",
   },
   {
+    id: "pay-nov-006",
+    organization_id: DEMO_ORG.id,
+    property_id: "prop-gn-001",
+    resident_id: "res-006", // Ananya Sen
+    rent_charge_id: "charge-nov-006",
+    receipt_number: "RCP-202611-0005",
+    amount_paise: 750000,
+    payment_method: "upi",
+    payment_date: "2026-11-04",
+    reference_number: "UPI/ANANYA/9911223",
+    recorded_by: "user-owner-001",
+    created_at: "2026-11-04T11:00:00Z",
+  },
+  {
     id: "pay-nov-014",
     organization_id: DEMO_ORG.id,
     property_id: "prop-us-002",
     resident_id: "res-014", // Divya Krishnan
     rent_charge_id: "charge-nov-014",
-    receipt_number: "RCP-202611-0005",
+    receipt_number: "RCP-202611-0006",
     amount_paise: 850000,
     payment_method: "upi",
     payment_date: "2026-11-04",
     reference_number: "UPI/DIVYA/9944112",
     recorded_by: "user-owner-001",
     created_at: "2026-11-04T12:00:00Z",
+  },
+  {
+    id: "pay-nov-021",
+    organization_id: DEMO_ORG.id,
+    property_id: "prop-lc-003",
+    resident_id: "res-021", // Arjun Nambiar
+    rent_charge_id: "charge-nov-021",
+    receipt_number: "RCP-202611-0007",
+    amount_paise: 1600000,
+    payment_method: "bank_transfer",
+    payment_date: "2026-11-03",
+    reference_number: "NEFT/ICICI/99887711",
+    recorded_by: "user-owner-001",
+    created_at: "2026-11-03T15:30:00Z",
   },
 ];
 
@@ -1065,6 +1321,18 @@ export const DEMO_DEPOSIT_TRANSACTIONS: DepositTransaction[] = [
     payment_method: "upi",
     transaction_date: "2026-02-01",
     created_at: "2026-02-01T11:00:00Z",
+  },
+  {
+    id: "dep-tx-021",
+    resident_id: "res-021",
+    stay_id: "stay-021",
+    property_id: "prop-lc-003",
+    transaction_type: "collected",
+    amount_paise: 3200000,
+    reason: "Executive studio security deposit",
+    payment_method: "bank_transfer",
+    transaction_date: "2026-04-10",
+    created_at: "2026-04-10T11:00:00Z",
   },
 ];
 
@@ -1117,7 +1385,7 @@ export const DEMO_MAINTENANCE_TICKETS: MaintenanceTicket[] = [
     resident_id: "res-014", // Divya Krishnan
     ticket_number: "TKT-2026-0103",
     title: "Wi-Fi router on 1st Floor dropping connection",
-    description: "Frequent disconnections every 15 minutes during Zoom office calls. Signal strength shows full but no internet throughput.",
+    description: "Frequent disconnections every 15 minutes during Zoom office calls. Signal strength shows full but no throughput.",
     category: "internet",
     priority: "urgent",
     status: "in_progress",
@@ -1160,6 +1428,21 @@ export const DEMO_MAINTENANCE_TICKETS: MaintenanceTicket[] = [
       },
     ],
   },
+  {
+    id: "ticket-005",
+    organization_id: DEMO_ORG.id,
+    property_id: "prop-lc-003",
+    room_id: "room-lc-101",
+    resident_id: "res-021", // Arjun Nambiar
+    ticket_number: "TKT-2026-0105",
+    title: "Split AC filter cleaning requested",
+    description: "Airflow feels slightly restricted, needs seasonal dust filter vacuuming.",
+    category: "cleaning",
+    priority: "low",
+    status: "open",
+    created_at: "2026-11-18T16:00:00Z",
+    comments: [],
+  },
 ];
 
 export const DEMO_NOTIFICATIONS: Notification[] = [
@@ -1189,5 +1472,14 @@ export const DEMO_NOTIFICATIONS: Notification[] = [
     type: "ticket_update",
     is_read: true,
     created_at: "2026-11-18T14:20:00Z",
+  },
+  {
+    id: "notif-004",
+    organization_id: DEMO_ORG.id,
+    title: "High Collection Rate",
+    message: "Lotus Co-Living reached 80% collection realization for November 2026.",
+    type: "announcement",
+    is_read: true,
+    created_at: "2026-11-16T12:00:00Z",
   },
 ];
