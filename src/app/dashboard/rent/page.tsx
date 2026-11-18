@@ -78,7 +78,7 @@ export default function RentManagementPage() {
         payment_method: payMethod,
         payment_date: new Date().toISOString().split("T")[0],
         reference_number: payReference,
-        notes: `Payment for ${selectedChargeForPay.billingMonth || "month"} via ${payMethod.toUpperCase()}`,
+        notes: `Payment for ${selectedChargeForPay.billing_month || "month"} via ${payMethod.toUpperCase()}`,
       });
 
       toast({

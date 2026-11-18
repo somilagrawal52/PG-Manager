@@ -77,7 +77,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return unsubscribe;
   }, []);
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const handleLogout = () => {
     toast({ title: "Signed Out", description: "Returning to sign-in page.", type: "info" });
@@ -232,7 +232,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           appStore.markNotificationRead(n.id);
                         }}
                         className={`p-2 rounded-lg text-xs cursor-pointer transition-colors ${
-                          n.isRead ? "bg-slate-50 text-slate-600" : "bg-blue-50/70 text-blue-950 font-medium"
+                          n.is_read ? "bg-slate-50 text-slate-600" : "bg-blue-50/70 text-blue-950 font-medium"
                         }`}
                       >
                         <p className="font-semibold text-xs">{n.title}</p>
